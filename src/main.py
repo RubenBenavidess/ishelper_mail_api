@@ -14,7 +14,6 @@ from config.settings import settings
 from routes import mail_router
 from utils.logger import get_logger
 
-load_dotenv()
 
 logger = get_logger(__name__)
 

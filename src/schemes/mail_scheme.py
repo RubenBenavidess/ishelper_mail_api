@@ -8,7 +8,7 @@ Author: ISHelper Team
 Version: 1.0.0
 """
 
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, ConfigDict
 
 
 class Mail(BaseModel):
@@ -95,4 +95,6 @@ class Mail(BaseModel):
         max_length=500,
         description="Detalle del requerimiento"
     )
+    
+    model_config = ConfigDict(extra="forbid")
 

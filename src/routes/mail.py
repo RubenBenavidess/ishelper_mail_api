@@ -8,10 +8,11 @@ Author: ISHelper Team
 Version: 1.0.0
 """
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Request, Response
 from controllers.mail_controller import MailController
 from schemes.mail_scheme import Mail
 from utils.logger import get_logger
+from middlewares.rate_limiting import limiter
 
 logger = get_logger(__name__)
 
@@ -42,7 +43,8 @@ mail_controller = MailController()
         500: {"description": "Internal server error occurred"}
     }
 )
-async def send_contact_mail(mail: Mail) -> dict:
+@limiter.limit("10/minute", error_message="Too many requests")
+async def send_contact_mail(request: Request, response: Response, mail: Mail) -> dict:
     """
     Send a contact email.
     
@@ -96,7 +98,8 @@ async def send_contact_mail(mail: Mail) -> dict:
     description="Checks that the mail service is running and correctly configured",
     response_model=dict
 )
-async def health_check() -> dict:
+@limiter.limit("5/minute", error_message="Too many requests")
+async def health_check(request: Request, response: Response) -> dict:
     try:
         logger.info("Health check requested")
         
@@ -121,3 +124,4 @@ async def health_check() -> dict:
                 "message": f"The mail service is unavailable: {str(e)}"
             }
         )
+    
